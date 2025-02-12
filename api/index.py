@@ -57,7 +57,8 @@ def submit_form():
 def healthchecker():
     return {"status": "success", "message": "Integrate Flask Framework with Next.js"}
 
-handler = handle_request(app)
+def vercel_handler(request, context):
+    return handle_request(app, request, context) 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
