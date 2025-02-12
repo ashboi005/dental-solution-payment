@@ -181,11 +181,17 @@ export default function Home() {
             >
               ×
             </button>
-            <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
+            
             {formSubmitted ? (
-              <p className="text-green-600">Thank you! We'll contact you shortly.</p>
+              <>
+              <h2 className="mb-4 text-2xl text-black font-bold">Thank You. Kindly Pay ₹999</h2>
+              <Button type="submit" size="lg" variant="glow" className="w-full">
+                  Proceed to Payment
+                </Button>
+              </>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 text-black">
+                <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
                 <input
                   type="text"
                   placeholder="Name"
