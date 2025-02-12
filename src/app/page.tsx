@@ -40,7 +40,7 @@ const courseModules = [
 ];
 
 const courseImages = [
-  { src: "/images/course1.jpg", alt: "Basal Implant Before and After" },
+  { src: "/images/course1.png", alt: "Basal Implant Before and After" },
   { src: "/images/course2.webp", alt: "Patient X-Ray" },
   { src: "/images/course3.webp", alt: "Various Types of Basal Implants" },
 ];
