@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import CountdownTimer from "./CountdownTimer";
 
+const backendUrl = "https://dentalsolutionsasr.pythonanywhere.com";
+
 const courseModules = [
   {
     title: "Introduction to Basal Implantology",
@@ -47,27 +49,24 @@ const courseImages = [
 
 export default function Home() {
   // State to control the offer modal (shown on initial load)
+  const targetDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
   const [showOfferModal, setShowOfferModal] = useState(true);
-  // State to control the form popup modal (triggered by pay/enroll buttons)
   const [showFormModal, setShowFormModal] = useState(false);
-  // Form state variables
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
-
-  // Define target date as 48 hours from now
-  const targetDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage(""); // Clear any previous error messages
 
     const data = { name: formName, phone: formPhone, email: formEmail };
 
     try {
-      // Replace '/api/submitForm' with your own API endpoint or Google Apps Script URL
-      const response = await fetch("/api/submit_form", {
+      const response = await fetch(`${backendUrl}/submit_form`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,15 +76,15 @@ export default function Home() {
 
       if (response.ok) {
         setFormSubmitted(true);
-        // Optionally clear the form fields
         setFormName("");
         setFormPhone("");
         setFormEmail("");
       } else {
-        console.error("Submission failed");
+        setErrorMessage("Submission failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      setErrorMessage("Error submitting form. Please check your internet connection.");
+      console.error("Submission error:", error);
     }
   };
 
@@ -182,16 +181,11 @@ export default function Home() {
             >
               ×
             </button>
+            <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
             {formSubmitted ? (
-              <>
-                <h2 className="mb-4 text-2xl text-black font-bold">Thank You! Please Pay ₹999</h2>
-                   <Button size="lg" variant="glow" className="w-full font-">
-                   Proceed to Payment
-                 </Button>
-              </>
+              <p className="text-green-600">Thank you! We'll contact you shortly.</p>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 text-black">
-                 <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
                 <input
                   type="text"
                   placeholder="Name"
@@ -216,9 +210,9 @@ export default function Home() {
                   className="w-full p-2 border border-gray-300 rounded"
                   required
                 />
-                   <Button size="lg" variant="cyber" className="w-full font-">
-                Submit Details
-              </Button>
+                <Button type="submit" size="lg" variant="cyber" className="w-full">
+                  Submit
+                </Button>
               </form>
             )}
           </div>
