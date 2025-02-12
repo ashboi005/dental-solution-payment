@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import CountdownTimer from "./CountdownTimer";
 
+const backendUrl = "http://localhost:8000";
+
 const courseModules = [
   {
     title: "Introduction to Basal Implantology",
@@ -46,13 +48,48 @@ const courseImages = [
 ];
 
 export default function Home() {
-  // State to control modal visibility (shown on initial load)
-  const [showOfferModal, setShowOfferModal] = useState(true);
-  // Define target date as 48 hours from now
+  // State to control the offer modal (shown on initial load)
   const targetDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  const [showOfferModal, setShowOfferModal] = useState(true);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [formName, setFormName] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Form submission handler
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage(""); // Clear any previous error messages
+
+    const data = { name: formName, phone: formPhone, email: formEmail };
+
+    try {
+      const response = await fetch(`${backendUrl}/submit_form`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setFormSubmitted(true);
+        setFormName("");
+        setFormPhone("");
+        setFormEmail("");
+      } else {
+        setErrorMessage("Submission failed. Please try again.");
+      }
+    } catch (error) {
+      setErrorMessage("Error submitting form. Please check your internet connection.");
+      console.error("Submission error:", error);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gray-900 text-gray-100">
+    <main className="min-h-screen bg-gray-900 text-gray-100 relative">
       {/* Offer Modal Popup (shown on page load) */}
       {showOfferModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
@@ -108,7 +145,15 @@ export default function Home() {
               {/* Button with flowing border */}
               <div className="relative inline-block group">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 animate-gradient-xy rounded-md opacity-75 group-hover:opacity-100 transition-all duration-500" />
-                <Button size="lg" variant="cyber" className="relative text-lg px-8 py-2">
+                <Button
+                  onClick={() => {
+                    setShowOfferModal(false);
+                    setShowFormModal(true);
+                  }}
+                  size="lg"
+                  variant="cyber"
+                  className="relative text-lg px-8 py-2"
+                >
                   Enroll Now
                 </Button>
               </div>
@@ -121,6 +166,55 @@ export default function Home() {
             >
               Offer valid for <CountdownTimer targetDate={targetDate} />
             </motion.div>
+          </div>
+        </div>
+      )}
+
+      {/* Form Modal Popup */}
+      {showFormModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="bg-white p-8 rounded-lg relative text-center max-w-md w-full mx-4">
+            <button
+              onClick={() => setShowFormModal(false)}
+              className="absolute top-2 right-2 text-black font-bold text-xl"
+              aria-label="Close Form"
+            >
+              ×
+            </button>
+            <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
+            {formSubmitted ? (
+              <p className="text-green-600">Thank you! We'll contact you shortly.</p>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 text-black">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  required
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={formEmail}
+                  onChange={(e) => setFormEmail(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  required
+                />
+                <Button type="submit" size="lg" variant="cyber" className="w-full">
+                  Submit
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       )}
@@ -195,7 +289,12 @@ export default function Home() {
           >
             <div className="relative inline-block group">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 animate-gradient-xy rounded-md opacity-75 group-hover:opacity-100 transition-all duration-500" />
-              <Button size="lg" variant="cyber" className="relative text-lg px-8 py-2">
+              <Button
+                onClick={() => setShowFormModal(true)}
+                size="lg"
+                variant="cyber"
+                className="relative text-lg px-8 py-2"
+              >
                 Enroll Now
               </Button>
             </div>
@@ -209,13 +308,10 @@ export default function Home() {
             Offer valid for <CountdownTimer targetDate={targetDate} />
           </motion.div>
         </div>
-        
       </section>
 
-      {/* Additional sections such as Course Details, Course Photos, Final CTA, etc. */}
-      {/* ... */}
-       {/* Course Details */}
-       <section className="bg-gray-800 py-16">
+      {/* Course Details */}
+      <section className="bg-gray-800 py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-8 text-center text-3xl font-semibold md:text-4xl">
             What You'll Learn
@@ -227,9 +323,9 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative  group rounded-lg p-1 bg-gradient-to-r from-yellow-500 via--500 to-red-500 animate-gradient-xy"
+                className="relative group rounded-lg p-1 bg-gradient-to-r from-yellow-500 via--500 to-red-500 animate-gradient-xy"
               >
-                <div className="rounded-lg md:h-[20vh] bg-gray-700 hover:bg-blue-800 p-4 shadow-lg transition-all duration-300 text-align-center">
+                <div className="rounded-lg md:h-[20vh] bg-gray-700 hover:bg-blue-800 p-4 shadow-lg transition-all duration-300">
                   <h3 className="mb-2 text-xl font-semibold text-blue-400">
                     {module.title}
                   </h3>
@@ -244,10 +340,6 @@ export default function Home() {
       {/* Course Photos */}
       <section className="py-16 md:px-0 px-6">
         <div className="container mx-auto px-4">
-          {/* Uncomment the heading below if needed */}
-          {/* <h2 className="mb-8 text-center text-3xl font-semibold md:text-4xl">
-            Course Preview
-          </h2> */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {courseImages.map((image, index) => (
               <motion.div
@@ -261,7 +353,7 @@ export default function Home() {
                   src={image.src}
                   alt={image.alt}
                   layout="fill"
-                  objectFit="5xl"
+                  objectFit="cover"
                   className="transition-transform duration-300 hover:scale-110"
                 />
               </motion.div>
@@ -296,7 +388,12 @@ export default function Home() {
           >
             <div className="relative inline-block group">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 animate-gradient-xy rounded-md opacity-75 group-hover:opacity-100 transition-all duration-500" />
-              <Button size="lg" variant="glow" className="relative text-lg px-8 py-2">
+              <Button
+                onClick={() => setShowFormModal(true)}
+                size="lg"
+                variant="glow"
+                className="relative text-lg px-8 py-2"
+              >
                 Pay Now - Start Learning
               </Button>
             </div>
@@ -304,11 +401,16 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white py-4 text-center z-50">
-      <span className="text-black font-bold uppercase tracking-wide">
-        LIMITED OFFER ONLY: ENROLL FOR THE MASTERCLASS FOR 999 ONLY
-      </span>
-    </div>
+      {/* Constant Bottom Bar */}
+      <div
+        onClick={() => setShowFormModal(true)}
+        className="fixed bottom-0 left-0 right-0 bg-white py-4 text-center z-50 cursor-pointer"
+      >
+        <span className="text-black font-bold uppercase tracking-wide">
+          LIMITED OFFER ONLY: ENROLL FOR THE MASTERCLASS FOR 999 ONLY
+        </span>
+      </div>
+
       {/* Global Styles for the Gradient Animation */}
       <style jsx global>{`
         @keyframes gradient-xy {
