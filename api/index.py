@@ -6,6 +6,7 @@ from google.oauth2.service_account import Credentials
 import json
 import os
 from dotenv import load_dotenv
+from serverless_wsgi import handle_request
 
 load_dotenv()
 
@@ -56,6 +57,7 @@ def submit_form():
 def healthchecker():
     return {"status": "success", "message": "Integrate Flask Framework with Next.js"}
 
+handler = handle_request(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
