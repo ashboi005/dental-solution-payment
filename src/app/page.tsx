@@ -1,8 +1,10 @@
 "use client";
 
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import CountdownTimer from "./CountdownTimer";
 
 const courseModules = [
   {
@@ -44,8 +46,87 @@ const courseImages = [
 ];
 
 export default function Home() {
+  // State to control modal visibility (shown on initial load)
+  const [showOfferModal, setShowOfferModal] = useState(true);
+  // Define target date as 48 hours from now
+  const targetDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
   return (
     <main className="min-h-screen bg-gray-900 text-gray-100">
+      {/* Offer Modal Popup (shown on page load) */}
+      {showOfferModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="bg-blue-700 p-8 rounded-lg relative text-center max-w-md w-full mx-4">
+            <button
+              onClick={() => setShowOfferModal(false)}
+              className="absolute top-2 right-2 text-white font-bold text-xl"
+              aria-label="Close Special Offer"
+            >
+              ×
+            </button>
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-4 text-3xl font-bold md:text-4xl"
+            >
+              Special Offer
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-4 text-lg font-semibold md:text-xl"
+            >
+              Boost your <span className="text-green-500">income</span> and expand your expertise for just
+            </motion.p>
+            <div className="mb-4">
+              {/* Original Price with strikethrough */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-xl text-red-500 line-through md:text-2xl"
+              >
+                ₹1999
+              </motion.div>
+              {/* Discounted Price */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="text-4xl font-bold text-yellow-400 md:text-5xl"
+              >
+                ₹999
+              </motion.div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              {/* Button with flowing border */}
+              <div className="relative inline-block group">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 animate-gradient-xy rounded-md opacity-75 group-hover:opacity-100 transition-all duration-500" />
+                <Button size="lg" variant="cyber" className="relative text-lg px-8 py-2">
+                  Enroll Now
+                </Button>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="mt-4 text-lg text-white"
+            >
+              Offer valid for <CountdownTimer targetDate={targetDate} />
+            </motion.div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Rest of your page content --- */}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden py-24">
         <div className="container mx-auto px-4 text-center">
@@ -70,7 +151,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Special Offer */}
+      {/* Special Offer Section (remains unchanged) */}
       <section className="bg-blue-700 py-16">
         <div className="container mx-auto px-4 text-center">
           <motion.h2
@@ -89,20 +170,29 @@ export default function Home() {
           >
             Boost your <span className="text-green-500">income</span> and expand your expertise for just
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-8 text-6xl font-bold text-yellow-400 md:text-7xl"
-          >
-            ₹999
-          </motion.div>
+          <div className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-2xl text-red-500 line-through md:text-3xl"
+            >
+              ₹1999
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-6xl font-bold text-yellow-400 md:text-7xl"
+            >
+              ₹999
+            </motion.div>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            {/* Button with flowing border */}
             <div className="relative inline-block group">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 animate-gradient-xy rounded-md opacity-75 group-hover:opacity-100 transition-all duration-500" />
               <Button size="lg" variant="cyber" className="relative text-lg px-8 py-2">
@@ -110,11 +200,22 @@ export default function Home() {
               </Button>
             </div>
           </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="mt-8 text-lg text-white"
+          >
+            Offer valid for <CountdownTimer targetDate={targetDate} />
+          </motion.div>
         </div>
+        
       </section>
 
-      {/* Course Details */}
-      <section className="bg-gray-800 py-16">
+      {/* Additional sections such as Course Details, Course Photos, Final CTA, etc. */}
+      {/* ... */}
+       {/* Course Details */}
+       <section className="bg-gray-800 py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-8 text-center text-3xl font-semibold md:text-4xl">
             What You'll Learn
@@ -203,6 +304,11 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="fixed bottom-0 left-0 right-0 bg-white py-4 text-center z-50">
+      <span className="text-black font-bold uppercase tracking-wide">
+        LIMITED OFFER ONLY: ENROLL FOR THE MASTERCLASS FOR 999 ONLY
+      </span>
+    </div>
       {/* Global Styles for the Gradient Animation */}
       <style jsx global>{`
         @keyframes gradient-xy {
