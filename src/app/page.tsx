@@ -57,23 +57,25 @@ export default function Home() {
   const [formEmail, setFormEmail] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmittingEnrollment, setIsSubmittingEnrollment] = useState(false);
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMessage(""); // Clear any previous error messages
-
+    setErrorMessage("");
+    setIsSubmittingEnrollment(true);
+  
     const data = { name: formName, phone: formPhone, email: formEmail };
-
+  
     try {
-      const response = await fetch(`${backendUrl}/submit_form`, {
+      const response = await fetch(`${backendUrl}/submit-form`, {  
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
         setFormSubmitted(true);
         setFormName("");
@@ -85,6 +87,8 @@ export default function Home() {
     } catch (error) {
       setErrorMessage("Error submitting form. Please check your internet connection.");
       console.error("Submission error:", error);
+    } finally {
+      setIsSubmittingEnrollment(false);
     }
   };
 
@@ -190,7 +194,7 @@ export default function Home() {
                 </Button>
               </>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4 text-black">
+                <form onSubmit={handleSubmit} className="space-y-4 text-black">
                 <h2 className="mb-4 text-2xl text-black font-bold">Enter Your Details</h2>
                 <input
                   type="text"
@@ -216,10 +220,17 @@ export default function Home() {
                   className="w-full p-2 border border-gray-300 rounded"
                   required
                 />
-                <Button type="submit" size="lg" variant="cyber" className="w-full">
-                  Submit
-                </Button>
-              </form>
+                <Button 
+              type="submit" 
+              size="lg" 
+              variant="cyber" 
+              className="w-full"
+              disabled={isSubmittingEnrollment}
+            >
+              {isSubmittingEnrollment ? "Submitting..." : "Submit"}
+              </Button>
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+                </form>
             )}
           </div>
         </div>
